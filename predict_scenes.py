@@ -25,12 +25,16 @@ def main():
     video_frames, single_frame_predictions, all_frame_predictions = scene_model.predict_video(args.videoFile)
     scenes_int32 = scene_model.predictions_to_scenes(single_frame_predictions, threshold=args.th)
     scenes = [list(map(int, s)) for s in scenes_int32]
+    print('='*15)
     for scene in scenes:
+        print(f'SCENE: {scene[0]}-{scene[1]}')
         output_video = output_video_filename.replace('_output.mp4', f'_{scene[0]}-{scene[1]}_output.mp4')
         output_videos.append(cv2.VideoWriter(
             output_video
             , cv2.VideoWriter_fourcc(*'XVID'), fps, (width, height)))
     all_frames = []
+    print('='*15)
+
     while True:
         for frame_num in tqdm.tqdm(range(int(num_frames))):
             ret, frame = video.read()
