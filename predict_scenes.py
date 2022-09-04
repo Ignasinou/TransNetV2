@@ -10,7 +10,7 @@ def main():
     args = parser.parse_args()
     filename = args.videoFile.split('/')[-1]
     output_txt = args.videoFile.replace(filename, f'output_scenes.json')
-
+    print(output_txt)
     scene_model = TransNetV2()
     video_frames, single_frame_predictions, all_frame_predictions = scene_model.predict_video(args.videoFile)
     scenes_int32 = scene_model.predictions_to_scenes(single_frame_predictions, threshold=args.th)
