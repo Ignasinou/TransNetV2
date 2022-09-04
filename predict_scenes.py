@@ -15,45 +15,47 @@ def main():
     output_video_filename = args.videoFile.replace(file_extension, '_output.mp4')
 
     video = cv2.VideoCapture(args.videoFile)
-    num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = video.get(cv2.CAP_PROP_FPS)
+    # num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    # width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    # height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # fps = video.get(cv2.CAP_PROP_FPS)
+    output_txt = output_video_filename.replace('_output.mp4', f'_output_scenes.txt')
 
-    output_videos = []
     scene_model = TransNetV2()
     video_frames, single_frame_predictions, all_frame_predictions = scene_model.predict_video(args.videoFile)
     scenes_int32 = scene_model.predictions_to_scenes(single_frame_predictions, threshold=args.th)
     scenes = [list(map(int, s)) for s in scenes_int32]
-    print('='*15)
-    for scene in scenes:
-        print(f'SCENE: {scene[0]}-{scene[1]}')
-    print('=' * 15)
 
-    for scene in scenes:
-        output_video = output_video_filename.replace('_output.mp4', f'_{scene[0]}-{scene[1]}_output.mp4')
-        output_videos.append(cv2.VideoWriter(
-            output_video
-            , cv2.VideoWriter_fourcc(*'XVID'), fps, (width, height)))
-    all_frames = []
+    with open(output_txt, 'w') as f:
 
-    while True:
-        for frame_num in tqdm.tqdm(range(int(num_frames))):
-            ret, frame = video.read()
-            all_frames.append(frame)
-        break
+        for scene in scenes:
+            f.write(f'{scene[0]} {scene[1]}\n')
 
-    for idx, scene in enumerate(scenes):
-        for fr in range(scene[0], scene[1], 1):
-            cv2.putText(all_frames[fr], f"Frame: #{fr}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 255, 0), 2, cv2.LINE_AA)
-            output_videos[idx].write(all_frames[fr])
 
-    for outVideo in output_videos:
-        outVideo.release()
-
-    cv2.destroyAllWindows()
-    video.release()
+    # for scene in scenes:
+    #     output_video = output_video_filename.replace('_output.mp4', f'_{scene[0]}-{scene[1]}_output.mp4')
+    #     output_videos.append(cv2.VideoWriter(
+    #         output_video
+    #         , cv2.VideoWriter_fourcc(*'XVID'), fps, (width, height)))
+    # all_frames = []
+    #
+    # while True:
+    #     for frame_num in tqdm.tqdm(range(int(num_frames))):
+    #         ret, frame = video.read()
+    #         all_frames.append(frame)
+    #     break
+    #
+    # for idx, scene in enumerate(scenes):
+    #     for fr in range(scene[0], scene[1], 1):
+    #         cv2.putText(all_frames[fr], f"Frame: #{fr}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+    #                     1, (0, 255, 0), 2, cv2.LINE_AA)
+    #         output_videos[idx].write(all_frames[fr])
+    #
+    # for outVideo in output_videos:
+    #     outVideo.release()
+    #
+    # cv2.destroyAllWindows()
+    # video.release()
 
 
 if __name__ == "__main__":
