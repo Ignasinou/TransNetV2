@@ -8,10 +8,8 @@ def main():
     parser.add_argument('--th', type=float, default=0.5)
 
     args = parser.parse_args()
-    file_extension = "." + args.videoFile.split(".")[-1]
-    output_video_filename = args.videoFile.replace(file_extension, '_output.mp4')
-
-    output_txt = output_video_filename.replace('_output.mp4', f'_output_scenes.txt')
+    filename = args.videoFile.split('/')[-1]
+    output_txt = args.videoFile.replace(filename, f'output_scenes.json')
 
     scene_model = TransNetV2()
     video_frames, single_frame_predictions, all_frame_predictions = scene_model.predict_video(args.videoFile)
@@ -20,7 +18,8 @@ def main():
     dictionary = {
         "scenes": scenes
     }
-    with open('output_scenes.json', 'w') as f:
+
+    with open(output_txt, 'w') as f:
         json.dump(dictionary, f)
 
 if __name__ == "__main__":
